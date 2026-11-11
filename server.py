@@ -3,6 +3,8 @@ import httpx
 
 app = FastAPI()
 
+CLIENT_ID = "Bisikg5aVNQWsZUHYcdDPSUmeiLDd1HMi1LuX_e0dNY"
+CLIENT_SECRET = "iaH1nU0t7Ye0jbL-7y_wbmJ0Ytcwows0YRjMih78aiU"
 BEARER_TOKEN = "BM2aMc9dG4nyy9cq_19RNR4ZOIOwq8TvCID05YldU8U"
 
 @app.get("/proxy")
@@ -18,6 +20,10 @@ async def proxy_mastodon(instance: str):
         try:
             response = await client.get(target_url, headers=headers)
             print(f"Mastodon status: {response.status_code}, response: {response.text[:200]}")
+            
+            if response.status_code != 200:
+                raise HTTPException(status_code=response.status_code, detail=response.text)
+                
             return response.json()
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
