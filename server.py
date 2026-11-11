@@ -3,12 +3,11 @@ import httpx
 
 app = FastAPI()
 
-CLIENT_ID = "Bisikg5aVNQWsZUHYcdDPSUmeiLDd1HMi1LuX_e0dNY"
-CLIENT_SECRET = "iaH1nU0t7Ye0jbL-7y_wbmJ0Ytcwows0YRjMih78aiU"
 BEARER_TOKEN = "BM2aMc9dG4nyy9cq_19RNR4ZOIOwq8TvCID05YldU8U"
 
 @app.get("/proxy")
 async def proxy_mastodon(instance: str):
+    # Запрашиваем общую публичную ленту
     target_url = f"https://{instance}/api/v1/timelines/public?limit=5"
     
     headers = {
@@ -19,10 +18,10 @@ async def proxy_mastodon(instance: str):
     async with httpx.AsyncClient() as client:
         try:
             response = await client.get(target_url, headers=headers)
-            print(f"Mastodon status: {response.status_code}, response: {response.text[:200]}")
+            print(f"Mastodon status: {response.status_code}, response: {response.text}")
             
             if response.status_code != 200:
-                raise HTTPException(status_code=response.status_code, detail=response.text)
+                raise HTTPException(status_code=response.status_code, detail=f"Mastodon returned {response.status_code}: {response.text}")
                 
             return response.json()
         except Exception as e:
