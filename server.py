@@ -11,12 +11,13 @@ async def proxy_mastodon(instance: str):
     
     headers = {
         "User-Agent": "MastoRama-CloudProxy/1.0",
-        "Authorization": f"Bearer {BEARER_TOKEN}"
+        "Authorization": f"Bearer {BEARER_TOKEN.strip()}"
     }
     
     async with httpx.AsyncClient() as client:
         try:
             response = await client.get(target_url, headers=headers)
+            print(f"Mastodon status: {response.status_code}, response: {response.text[:200]}")
             return response.json()
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
