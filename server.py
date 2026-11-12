@@ -4,11 +4,15 @@ import httpx
 app = FastAPI()
 
 @app.get("/proxy")
-async def proxy(instance: str):
+async def proxy(instance: str, since_id: str = None):
     clean_instance = instance.replace("https://", "").replace("http://", "").strip('/')
+    url = f"https://{clean_instance}/api/v1/timelines/public"
+    if since_id:
+        url += f"?since_id={since_id}"
+        
     async with httpx.AsyncClient() as client:
         try:
-            response = await client.get(f"https://{clean_instance}/api/v1/timelines/public", timeout=10.0)
+            response = await client.get(url, timeout=10.0)
             return response.json()
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
